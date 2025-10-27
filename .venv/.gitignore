@@ -1,0 +1,14 @@
+# Ignorar archivos de entorno virtual
+.venv/
+venv/
+
+# Archivos compilados de Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Base de datos local
+*.db
+
+# Archivos de entorno
+.env
