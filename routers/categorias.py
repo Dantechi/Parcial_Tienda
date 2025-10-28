@@ -45,3 +45,20 @@ def listar_categorias_activas(session: Session = Depends(get_session)):
     """
     categorias = session.exec(select(Categoria).where(Categoria.activa == True)).all()
     return categorias
+
+# ======================
+# 🟢 OBTENER CATEGORÍA CON SUS PRODUCTOS
+# ======================
+
+@router.get("/{categoria_id}", response_model=CategoriaRead)
+def obtener_categoria_con_productos(categoria_id: int, session: Session = Depends(get_session)):
+    """
+    Retorna una categoría por su ID junto con sus productos relacionados.
+    """
+    categoria = session.get(Categoria, categoria_id)
+    if not categoria:
+        raise HTTPException(status_code=404, detail="Categoría no encontrada")
+
+    # Carga los productos (relación 1:N)
+    categoria.productos  # Esto carga los productos relacionados
+    return categoria
