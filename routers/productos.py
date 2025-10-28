@@ -84,3 +84,20 @@ def listar_productos(
 
     productos = session.exec(query).all()
     return productos
+
+# ======================
+# 🔁 OBTENER PRODUCTO CON SU CATEGORÍA
+# ======================
+
+@router.get("/{producto_id}", response_model=ProductoRead)
+def obtener_producto(producto_id: int, session: Session = Depends(get_session)):
+    """
+    Retorna un producto por ID junto con su categoría asociada.
+    """
+    producto = session.get(Producto, producto_id)
+    if not producto:
+        raise HTTPException(status_code=404, detail="Producto no encontrado")
+
+    # Accede a la categoría para asegurar que se incluya en la respuesta
+    producto.categoria
+    return producto
