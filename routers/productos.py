@@ -48,3 +48,39 @@ def crear_producto(producto: ProductoCreate, session: Session = Depends(get_sess
     session.commit()
     session.refresh(nuevo_producto)
     return nuevo_producto
+
+# ======================
+# 🔍 LISTAR PRODUCTOS CON FILTROS
+# ======================
+
+from typing import Optional
+
+@router.get("/", response_model=list[ProductoRead])
+def listar_productos(
+    session: Session = Depends(get_session),
+    categoria_id: Optional[int] = None,
+    stock_min: Optional[int] = None,
+    precio_max: Optional[float] = None,
+    activos: Optional[bool] = True
+):
+    """
+    Lista productos con filtros opcionales:
+    - categoria_id → filtra por categoría
+    - stock_min → productos con stock mayor o igual
+    - precio_max → productos con precio menor o igual
+    - activos → True (por defecto) para ver solo los activos
+    """
+    query = select(Producto)
+
+    # Filtros dinámicos
+    if categoria_id:
+        query = query.where(Producto.categoria_id == categoria_id)
+    if stock_min is not None:
+        query = query.where(Producto.stock >= stock_min)
+    if precio_max is not None:
+        query = query.where(Producto.precio <= precio_max)
+    if activos is not None:
+        query = query.where(Producto.activo == activos)
+
+    productos = session.exec(query).all()
+    return productos
