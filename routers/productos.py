@@ -101,3 +101,42 @@ def obtener_producto(producto_id: int, session: Session = Depends(get_session)):
     # Accede a la categoría para asegurar que se incluya en la respuesta
     producto.categoria
     return producto
+
+# ======================
+# ⚙️ ACTUALIZAR PRODUCTO
+# ======================
+
+@router.put("/{producto_id}", response_model=ProductoRead)
+def actualizar_producto(producto_id: int, datos: ProductoCreate, session: Session = Depends(get_session)):
+    """
+    Actualiza un producto existente validando:
+    - Que el nuevo stock no sea negativo.
+    - Que el precio sea positivo.
+    - Que la categoría exista y esté activa.
+    """
+    producto = session.get(Producto, producto_id)
+    if not producto:
+        raise HTTPException(status_code=404, detail="Producto no encontrado")
+
+    # Validar categoría
+    categoria = session.get(Categoria, datos.categoria_id)
+    if not categoria or not categoria.activa:
+        raise HTTPException(status_code=404, detail="Categoría no encontrada o inactiva")
+
+    # Validaciones de negocio
+    if datos.stock < 0:
+        raise HTTPException(status_code=400, detail="El stock no puede ser negativo")
+    if datos.precio <= 0:
+        raise HTTPException(status_code=400, detail="El precio debe ser mayor que cero")
+
+    # Actualizar campos
+    producto.nombre = datos.nombre
+    producto.descripcion = datos.descripcion
+    producto.precio = datos.precio
+    producto.stock = datos.stock
+    producto.categoria_id = datos.categoria_id
+
+    session.add(producto)
+    session.commit()
+    session.refresh(producto)
+    return producto
