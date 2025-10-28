@@ -62,3 +62,58 @@ def obtener_categoria_con_productos(categoria_id: int, session: Session = Depend
     # Carga los productos (relación 1:N)
     categoria.productos  # Esto carga los productos relacionados
     return categoria
+
+# ======================
+# 🟡 ACTUALIZAR CATEGORÍA
+# ======================
+
+@router.put("/{categoria_id}", response_model=CategoriaRead)
+def actualizar_categoria(categoria_id: int, datos: CategoriaCreate, session: Session = Depends(get_session)):
+    """
+    Actualiza el nombre o descripción de una categoría existente.
+    No permite duplicar nombres.
+    """
+    categoria = session.get(Categoria, categoria_id)
+    if not categoria:
+        raise HTTPException(status_code=404, detail="Categoría no encontrada")
+
+    # Verificar nombre único (si se cambia)
+    if categoria.nombre != datos.nombre:
+        existente = session.exec(select(Categoria).where(Categoria.nombre == datos.nombre)).first()
+        if existente:
+            raise HTTPException(status_code=409, detail="Ya existe otra categoría con ese nombre.")
+
+    categoria.nombre = datos.nombre
+    categoria.descripcion = datos.descripcion
+
+    session.add(categoria)
+    session.commit()
+    session.refresh(categoria)
+    return categoria
+
+
+# ======================
+# 🔴 DESACTIVAR CATEGORÍA
+# ======================
+
+@router.delete("/{categoria_id}", response_model=CategoriaRead)
+def desactivar_categoria(categoria_id: int, session: Session = Depends(get_session)):
+    """
+    Desactiva una categoría en lugar de eliminarla físicamente.
+    Si se desactiva, todos sus productos también se desactivan (cascada lógica).
+    """
+    categoria = session.get(Categoria, categoria_id)
+    if not categoria:
+        raise HTTPException(status_code=404, detail="Categoría no encontrada")
+
+    categoria.activa = False
+
+    # Desactivar también todos sus productos
+    for producto in categoria.productos:
+        producto.activo = False
+        session.add(producto)
+
+    session.add(categoria)
+    session.commit()
+    session.refresh(categoria)
+    return categoria
