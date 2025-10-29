@@ -163,3 +163,38 @@ def desactivar_producto(producto_id: int, session: Session = Depends(get_session
     session.commit()
     session.refresh(producto)
     return producto
+
+# =======================================
+# 📦 RESTAR STOCK (GESTIONAR COMPRA)
+# =======================================
+
+from pydantic import BaseModel
+
+class CompraRequest(BaseModel):
+    cantidad: int
+
+
+@router.patch("/{producto_id}/comprar", response_model=ProductoRead)
+def comprar_producto(producto_id: int, data: CompraRequest, session: Session = Depends(get_session)):
+    """
+    Permite comprar un producto, restando del stock la cantidad indicada.
+    Valida que el stock no quede en negativo.
+    """
+    producto = session.get(Producto, producto_id)
+    if not producto:
+        raise HTTPException(status_code=404, detail="Producto no encontrado")
+
+    if not producto.activo:
+        raise HTTPException(status_code=400, detail="No se puede comprar un producto inactivo")
+
+    if data.cantidad <= 0:
+        raise HTTPException(status_code=400, detail="La cantidad debe ser mayor que cero")
+
+    if producto.stock < data.cantidad:
+        raise HTTPException(status_code=400, detail="Stock insuficiente para la compra")
+
+    producto.stock -= data.cantidad
+    session.add(producto)
+    session.commit()
+    session.refresh(producto)
+    return producto
