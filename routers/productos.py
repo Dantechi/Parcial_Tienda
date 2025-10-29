@@ -140,3 +140,26 @@ def actualizar_producto(producto_id: int, datos: ProductoCreate, session: Sessio
     session.commit()
     session.refresh(producto)
     return producto
+
+# ==========================
+# 🧹 DESACTIVAR UN PRODUCTO
+# ==========================
+
+@router.patch("/{producto_id}/desactivar", response_model=ProductoRead)
+def desactivar_producto(producto_id: int, session: Session = Depends(get_session)):
+    """
+    Desactiva un producto (DELETE lógico).
+    No se elimina de la base de datos, solo se marca como inactivo.
+    """
+    producto = session.get(Producto, producto_id)
+    if not producto:
+        raise HTTPException(status_code=404, detail="Producto no encontrado")
+
+    if not producto.activo:
+        raise HTTPException(status_code=409, detail="El producto ya está inactivo")
+
+    producto.activo = False
+    session.add(producto)
+    session.commit()
+    session.refresh(producto)
+    return producto
