@@ -1,10 +1,10 @@
 """
 Modelos SQLModel para la Tienda Online.
-Define las entidades principales: Categoria y Producto.
-Relación 1:N → Una categoría tiene muchos productos.
+Incluye mejoras de campos automáticos y productos destacados.
 """
 
 from typing import Optional, List
+from datetime import datetime
 from sqlmodel import SQLModel, Field, Relationship
 
 # ======================
@@ -20,6 +20,7 @@ class Categoria(SQLModel, table=True):
     nombre: str = Field(index=True, unique=True, nullable=False)
     descripcion: Optional[str] = None
     activa: bool = Field(default=True)
+    fecha_creacion: datetime = Field(default_factory=datetime.utcnow)
 
     # Relación 1:N con Producto
     productos: List["Producto"] = Relationship(back_populates="categoria")
@@ -40,7 +41,9 @@ class Producto(SQLModel, table=True):
     precio: float = Field(gt=0, description="Precio del producto, debe ser mayor que 0")
     stock: int = Field(default=0, ge=0, description="Cantidad disponible en inventario")
     activo: bool = Field(default=True)
+    destacado: bool = Field(default=False)
+    fecha_creacion: datetime = Field(default_factory=datetime.utcnow)
+    ultima_actualizacion: datetime = Field(default_factory=datetime.utcnow)
 
-    # Relación con categoría
     categoria_id: int = Field(foreign_key="categoria.id")
     categoria: Optional[Categoria] = Relationship(back_populates="productos")

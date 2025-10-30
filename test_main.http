@@ -1,11 +1,233 @@
-# Test your FastAPI endpoints
+### ========================
+### 🏁 TEST API TIENDA ONLINE
 
-GET http://127.0.0.1:8000/
-Accept: application/json
+@baseUrl = http://127.0.0.1:8000
+
+### ========================
+### 🔹 1. Crear categorías
+### ========================
+
+POST {{baseUrl}}/categorias/
+Content-Type: application/json
+
+{
+  "nombre": "Electrónica",
+  "descripcion": "Productos tecnológicos como celulares y laptops"
+}
 
 ###
+POST {{baseUrl}}/categorias/
+Content-Type: application/json
 
-GET http://127.0.0.1:8000/hello/User
-Accept: application/json
+{
+  "nombre": "Hogar",
+  "descripcion": "Artículos para el hogar y cocina"
+}
 
 ###
+POST {{baseUrl}}/categorias/
+Content-Type: application/json
+
+{
+  "nombre": "Deportes",
+  "descripcion": "Equipamiento deportivo y accesorios"
+}
+
+
+### ========================
+### 🔹 2. Listar categorías activas
+### ========================
+
+GET {{baseUrl}}/categorias/
+
+
+### ========================
+### 🔹 3. Obtener categoría con sus productos (vacía al inicio)
+### ========================
+
+GET {{baseUrl}}/categorias/1
+
+
+### ========================
+### 🔹 4. Crear productos (valores válidos)
+### ========================
+
+POST {{baseUrl}}/productos/
+Content-Type: application/json
+
+{
+  "nombre": "Laptop Lenovo",
+  "descripcion": "Portátil de 15 pulgadas con procesador i7",
+  "precio": 3500.50,
+  "stock": 10,
+  "categoria_id": 1
+}
+
+###
+POST {{baseUrl}}/productos/
+Content-Type: application/json
+
+{
+  "nombre": "Refrigerador LG",
+  "descripcion": "Refrigerador de doble puerta",
+  "precio": 2800.00,
+  "stock": 5,
+  "categoria_id": 2
+}
+
+###
+POST {{baseUrl}}/productos/
+Content-Type: application/json
+
+{
+  "nombre": "Bicicleta Trek",
+  "descripcion": "Bicicleta de montaña con frenos de disco",
+  "precio": 1200.00,
+  "stock": 15,
+  "categoria_id": 3
+}
+
+
+### ========================
+### 🔹 5. Listar productos (sin filtros)
+### ========================
+
+GET {{baseUrl}}/productos/
+
+
+### ========================
+### 🔹 6. Listar productos por filtro de stock
+### ========================
+
+GET {{baseUrl}}/productos/?stock_min=11&stock_max=12
+
+### (Debe devolver mensaje 404: No hay productos disponibles con esos filtros)
+
+
+### ========================
+### 🔹 7. Listar productos por precio (filtros)
+### ========================
+
+GET {{baseUrl}}/productos/?precio_min=500&precio_max=2000
+
+
+### ========================
+### 🔹 8. Obtener producto con su categoría
+### ========================
+
+GET {{baseUrl}}/productos/1
+
+
+### ========================
+### 🔹 9. Actualizar producto (subir precio)
+### ========================
+
+PUT {{baseUrl}}/productos/1
+Content-Type: application/json
+
+{
+  "nombre": "Laptop Lenovo",
+  "descripcion": "Laptop actualizada con mejor procesador",
+  "precio": 4000.00,
+  "stock": 10,
+  "categoria_id": 1
+}
+
+
+### ========================
+### 🔹 10. Comprar producto (restar stock)
+### ========================
+
+PATCH {{baseUrl}}/productos/1/comprar
+Content-Type: application/json
+
+{
+  "cantidad": 2
+}
+
+
+### ========================
+### 🔹 11. Desactivar producto
+### ========================
+
+PATCH {{baseUrl}}/productos/1/desactivar
+
+
+### ========================
+### 🔹 12. Reactivar producto
+### ========================
+
+PATCH {{baseUrl}}/productos/1/reactivar
+
+
+### ========================
+### 🔹 13. Desactivar categoría (y sus productos)
+### ========================
+
+PATCH {{baseUrl}}/categorias/1/desactivar
+
+
+### ========================
+### 🔹 14. Reactivar categoría (y sus productos)
+### ========================
+
+PATCH {{baseUrl}}/categorias/1/reactivar
+
+
+### ========================
+### 🔹 15. Validar unicidad de categoría (debe dar error 409)
+### ========================
+
+POST {{baseUrl}}/categorias/
+Content-Type: application/json
+
+{
+  "nombre": "Hogar",
+  "descripcion": "Intento duplicado de categoría existente"
+}
+
+
+### ========================
+### 🔹 16. Error de stock negativo
+### ========================
+
+POST {{baseUrl}}/productos/
+Content-Type: application/json
+
+{
+  "nombre": "Televisor Samsung",
+  "descripcion": "Pantalla OLED 55 pulgadas",
+  "precio": 3500.00,
+  "stock": -2,
+  "categoria_id": 1
+}
+
+
+### ========================
+### 🔹 17. Error de precio inválido
+### ========================
+
+POST {{baseUrl}}/productos/
+Content-Type: application/json
+
+{
+  "nombre": "Cafetera Philips",
+  "descripcion": "Cafetera automática",
+  "precio": 0,
+  "stock": 5,
+  "categoria_id": 2
+}
+
+
+### ========================
+### 🔹 18. Obtener categoría con productos (después de todo)
+### ========================
+
+GET {{baseUrl}}/categorias/1
+
+
+### ========================
+### 🔹 19. Listar productos finales
+### ========================
+
+GET {{baseUrl}}/productos/

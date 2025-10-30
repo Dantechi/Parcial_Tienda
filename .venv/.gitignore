@@ -1,14 +1,17 @@
-# Ignorar archivos de entorno virtual
+# --- Ignorar base de datos local ---
+tienda.db
+
+# --- Ignorar bases de datos temporales ---
+*.db
+*.sqlite
+*.sqlite3
+
+# --- Ignorar entorno virtual ---
 .venv/
 venv/
-
-# Archivos compilados de Python
 __pycache__/
 *.pyc
-*.pyo
 
-# Base de datos local
-*.db
-
-# Archivos de entorno
+# --- Ignorar configuraciones locales ---
 .env
+*.log
