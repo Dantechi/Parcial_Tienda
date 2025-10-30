@@ -1,21 +1,20 @@
-###
-# 🧩 TEST MAIN — API Tienda Online
-# Autor: Pablo — Proyecto Parcial FastAPI
-# Objetivo: Validar endpoints CRUD, lógica de negocio, relaciones y reglas
-###
+### 🧩 TEST API — Sistema de Tienda Online
+# Autor: Pablo
+# Proyecto Parcial — FastAPI + SQLModel
+# Objetivo: Probar CRUD, filtros, relaciones y reglas de negocio
 
 @baseUrl = http://127.0.0.1:8000
 
-##############################################################
-# 1️⃣ CREAR CATEGORÍAS
-##############################################################
+##########################################################
+### 1️⃣ CREAR CATEGORÍAS
+##########################################################
 
 POST {{baseUrl}}/categorias/
 Content-Type: application/json
 
 {
   "nombre": "Electrónica",
-  "descripcion": "Productos tecnológicos como celulares y laptops"
+  "descripcion": "Productos tecnológicos como celulares, laptops y accesorios"
 }
 
 ###
@@ -25,7 +24,7 @@ Content-Type: application/json
 
 {
   "nombre": "Ropa",
-  "descripcion": "Moda y prendas para hombres y mujeres"
+  "descripcion": "Moda, prendas y accesorios"
 }
 
 ###
@@ -35,57 +34,61 @@ Content-Type: application/json
 
 {
   "nombre": "Hogar",
-  "descripcion": "Artículos para el hogar y cocina"
+  "descripcion": "Artículos y electrodomésticos para el hogar"
 }
 
-##############################################################
-# 2️⃣ LISTAR CATEGORÍAS ACTIVAS
-##############################################################
+##########################################################
+### 2️⃣ LISTAR CATEGORÍAS ACTIVAS
+##########################################################
 
 GET {{baseUrl}}/categorias/
 
-# 💬 Esperado: Lista con las categorías creadas (3 activas)
+# 💬 Esperado → 3 categorías activas
 
-##############################################################
-# 3️⃣ ACTUALIZAR CATEGORÍA
-##############################################################
+##########################################################
+### 3️⃣ OBTENER CATEGORÍA POR ID CON SUS PRODUCTOS
+##########################################################
 
-PUT {{baseUrl}}/categorias/1
+GET {{baseUrl}}/categorias/1
+
+# 💬 Esperado → categoría “Electrónica” con lista vacía (aún sin productos)
+
+##########################################################
+### 4️⃣ ACTUALIZAR UNA CATEGORÍA
+##########################################################
+
+PUT {{baseUrl}}/categorias/2
 Content-Type: application/json
 
 {
-  "descripcion": "Dispositivos electrónicos y tecnológicos modernos"
+  "descripcion": "Ropa y accesorios para hombres, mujeres y niños"
 }
 
-# 💬 Esperado: categoría actualizada correctamente
+# 💬 Esperado → categoría “Ropa” actualizada
 
-##############################################################
-# 4️⃣ DESACTIVAR UNA CATEGORÍA
-##############################################################
+##########################################################
+### 5️⃣ DESACTIVAR Y REACTIVAR CATEGORÍA
+##########################################################
 
 PATCH {{baseUrl}}/categorias/3/desactivar
+# 💬 Esperado → categoría “Hogar” ahora inactiva
 
-# 💬 Esperado: categoría "Hogar" inactiva
-
-##############################################################
-# 5️⃣ REACTIVAR CATEGORÍA (Nueva funcionalidad)
-##############################################################
+###
 
 PATCH {{baseUrl}}/categorias/3/reactivar
+# 💬 Esperado → categoría “Hogar” reactivada
 
-# 💬 Esperado: categoría "Hogar" reactivada (activa = true)
-
-##############################################################
-# 6️⃣ CREAR PRODUCTOS
-##############################################################
+##########################################################
+### 6️⃣ CREAR PRODUCTOS
+##########################################################
 
 POST {{baseUrl}}/productos/
 Content-Type: application/json
 
 {
-  "nombre": "Laptop Lenovo",
-  "descripcion": "Laptop potente para trabajo y estudio",
-  "precio": 3200.50,
+  "nombre": "Laptop Lenovo ThinkPad",
+  "descripcion": "Laptop profesional 16GB RAM, SSD 512GB",
+  "precio": 3500.00,
   "stock": 10,
   "categoria_id": 1
 }
@@ -96,10 +99,23 @@ POST {{baseUrl}}/productos/
 Content-Type: application/json
 
 {
+  "nombre": "Mouse Gamer RGB",
+  "descripcion": "Mouse con luces LED, 6 botones programables",
+  "precio": 120.50,
+  "stock": 5,
+  "categoria_id": 1
+}
+
+###
+
+POST {{baseUrl}}/productos/
+Content-Type: application/json
+
+{
   "nombre": "Camiseta Oversize",
-  "descripcion": "Camiseta 100% algodón",
-  "precio": 35.99,
-  "stock": 25,
+  "descripcion": "Camiseta 100% algodón, talla única",
+  "precio": 39.99,
+  "stock": 20,
   "categoria_id": 2
 }
 
@@ -109,132 +125,106 @@ POST {{baseUrl}}/productos/
 Content-Type: application/json
 
 {
-  "nombre": "Plancha Oster",
+  "nombre": "Plancha Oster Pro",
   "descripcion": "Plancha de vapor moderna",
-  "precio": 150.00,
-  "stock": 5,
+  "precio": 199.99,
+  "stock": 8,
   "categoria_id": 3
 }
 
-###
+# 💬 Esperado → todos los productos creados (stock no negativo)
 
-POST {{baseUrl}}/productos/
-Content-Type: application/json
-
-{
-  "nombre": "Mouse Gamer",
-  "descripcion": "Mouse RGB con 6 botones programables",
-  "precio": 120.75,
-  "stock": 0,
-  "categoria_id": 1
-}
-
-# 💬 Esperado: todos los productos creados correctamente (stock no negativo)
-
-##############################################################
-# 7️⃣ LISTAR PRODUCTOS (todos)
-##############################################################
+##########################################################
+### 7️⃣ LISTAR PRODUCTOS (todos los activos)
+##########################################################
 
 GET {{baseUrl}}/productos/
 
-# 💬 Esperado: todos los productos creados (4 registros)
+# 💬 Esperado → lista con 4 productos
 
-##############################################################
-# 8️⃣ LISTAR PRODUCTOS POR FILTRO (por categoría)
-##############################################################
+##########################################################
+### 8️⃣ FILTRAR PRODUCTOS POR CATEGORÍA
+##########################################################
 
 GET {{baseUrl}}/productos/?categoria_id=1
 
-# 💬 Esperado: productos de Electrónica
+# 💬 Esperado → Laptop Lenovo + Mouse Gamer
 
-##############################################################
-# 9️⃣ FILTRAR PRODUCTOS POR PRECIO
-##############################################################
+##########################################################
+### 9️⃣ FILTRAR PRODUCTOS POR PRECIO
+##########################################################
 
 GET {{baseUrl}}/productos/?precio_min=100&precio_max=200
 
-# 💬 Esperado: productos con precio entre 100 y 200 (ej. Mouse y Plancha)
+# 💬 Esperado → Plancha Oster y Mouse Gamer
 
-##############################################################
-# 🔟 FILTRAR PRODUCTOS POR STOCK (rango)
-##############################################################
+##########################################################
+### 🔟 FILTRAR PRODUCTOS POR STOCK
+##########################################################
 
-GET {{baseUrl}}/productos/?stock_min=20&stock_max=30
+GET {{baseUrl}}/productos/?stock_min=15&stock_max=25
 
-# 💬 Esperado: productos dentro del rango, o mensaje "No hay productos disponibles"
+# 💬 Esperado → Camiseta Oversize
+# 💬 Si no hay productos → mensaje “No hay productos disponibles”
 
-##############################################################
-# 11️⃣ OBTENER PRODUCTO CON SU CATEGORÍA
-##############################################################
+##########################################################
+### 11️⃣ OBTENER PRODUCTO CON SU CATEGORÍA
+##########################################################
 
 GET {{baseUrl}}/productos/1
 
-# 💬 Esperado: producto "Laptop Lenovo" con su categoría "Electrónica"
+# 💬 Esperado → Laptop Lenovo con categoría “Electrónica”
 
-##############################################################
-# 12️⃣ OBTENER CATEGORÍA CON SUS PRODUCTOS
-##############################################################
-
-GET {{baseUrl}}/categorias/1
-
-# 💬 Esperado: categoría "Electrónica" con lista de productos (Laptop, Mouse)
-
-##############################################################
-# 13️⃣ ACTUALIZAR PRODUCTO
-##############################################################
+##########################################################
+### 12️⃣ ACTUALIZAR PRODUCTO
+##########################################################
 
 PUT {{baseUrl}}/productos/1
 Content-Type: application/json
 
 {
-  "precio": 2999.99,
-  "descripcion": "Laptop actualizada - versión 2025"
+  "precio": 3299.99,
+  "descripcion": "Laptop Lenovo ThinkPad (versión 2025 actualizada)"
 }
 
-# Esperado: Laptop actualizada correctamente
+# 💬 Esperado → producto actualizado correctamente
 
-##############################################################
-# 14️⃣ DESACTIVAR PRODUCTO
-##############################################################
+##########################################################
+### 13️⃣ DESACTIVAR Y REACTIVAR PRODUCTO
+##########################################################
 
-PATCH {{baseUrl}}/productos/4/desactivar
+PATCH {{baseUrl}}/productos/2/desactivar
+# 💬 Esperado → Mouse Gamer inactivo
 
-# 💬 Esperado: producto "Mouse Gamer" ahora inactivo
+###
 
-##############################################################
-# 15️⃣ REACTIVAR PRODUCTO (nueva funcionalidad)
-##############################################################
+PATCH {{baseUrl}}/productos/2/reactivar
+# 💬 Esperado → Mouse Gamer reactivado
 
-PATCH {{baseUrl}}/productos/4/reactivar
-
-# 💬 Esperado: producto "Mouse Gamer" reactivado
-
-##############################################################
-# 16️⃣ RESTAR STOCK (simula una compra)
-##############################################################
+##########################################################
+### 14️⃣ RESTAR STOCK (simulación de compra)
+##########################################################
 
 PATCH {{baseUrl}}/productos/1/restar_stock?cantidad=3
+# 💬 Esperado → stock reducido de 10 → 7
 
-# 💬 Esperado: stock de Laptop Lenovo reducido de 10 → 7
+##########################################################
+### 15️⃣ ERROR — STOCK NEGATIVO
+##########################################################
 
-##############################################################
-# 17️⃣ ERROR DE LÓGICA - STOCK NEGATIVO
-##############################################################
+PATCH {{baseUrl}}/productos/1/restar_stock?cantidad=100
+# 💬 Esperado → error 400 con mensaje “No se puede dejar stock negativo”
 
-PATCH {{baseUrl}}/productos/3/restar_stock?cantidad=99
-
-# 💬 Esperado: error 400 con mensaje “No se puede dejar stock negativo”
-
-##############################################################
-# 18️⃣ ERROR DE LÓGICA - NOMBRE DE CATEGORÍA DUPLICADO
-##############################################################
+##########################################################
+### 16️⃣ ERROR — CATEGORÍA DUPLICADA
+##########################################################
 
 POST {{baseUrl}}/categorias/
 Content-Type: application/json
 
 {
   "nombre": "Electrónica",
-  "descripcion": "Intento duplicado"
+  "descripcion": "Intento de duplicado"
 }
 
-# 💬 Esperado: error 409 “El nombre de la categoría ya existe”
+# 💬 Esperado → error 409 “El nombre de la categoría ya existe”
