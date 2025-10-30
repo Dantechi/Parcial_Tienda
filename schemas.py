@@ -26,7 +26,7 @@ class CategoriaRead(CategoriaBase):
     activa: bool
 
     class Config:
-        orm_mode = True
+        from_attributes = True  # ✅ Pydantic v2 compatible
 
 
 class CategoriaUpdate(BaseModel):
@@ -59,7 +59,7 @@ class ProductoRead(ProductoBase):
     categoria_id: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class ProductoUpdate(BaseModel):
@@ -70,3 +70,12 @@ class ProductoUpdate(BaseModel):
     stock: Optional[int] = None
     activo: Optional[bool] = None
     categoria_id: Optional[int] = None
+
+
+# ==============================
+# 🔗 CATEGORÍA CON PRODUCTOS
+# ==============================
+
+class CategoriaConProductos(CategoriaRead):
+    """Devuelve la categoría junto con la lista de productos asociados"""
+    productos: List[ProductoRead] = []

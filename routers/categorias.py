@@ -41,13 +41,22 @@ def listar_categorias_activas(session: Session = Depends(get_session)):
 # 🟢 OBTENER CATEGORÍA CON SUS PRODUCTOS
 # ======================
 
-@router.get("/{categoria_id}", response_model=CategoriaRead)
+from schemas import CategoriaConProductos  # ✅ importa el nuevo esquema
+
+@router.get("/{categoria_id}", response_model=CategoriaConProductos)
 def obtener_categoria_con_productos(categoria_id: int, session: Session = Depends(get_session)):
+    """
+    Retorna una categoría por su ID junto con sus productos relacionados.
+    Incluye la relación 1:N en la respuesta.
+    """
     categoria = session.get(Categoria, categoria_id)
     if not categoria:
         raise HTTPException(status_code=404, detail="Categoría no encontrada")
+
+    # Carga los productos asociados
     categoria.productos
     return categoria
+
 
 # ======================
 # 🟡 ACTUALIZAR CATEGORÍA
