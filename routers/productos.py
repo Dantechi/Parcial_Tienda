@@ -8,6 +8,8 @@ from sqlmodel import Session, select
 from db import get_session
 from models import Producto, Categoria
 from schemas import ProductoCreate, ProductoRead
+from typing import List, Optional  # ✅ IMPORTACIÓN CORREGIDA
+from pydantic import BaseModel
 
 router = APIRouter(prefix="/productos", tags=["Productos"])
 
@@ -49,11 +51,10 @@ def crear_producto(producto: ProductoCreate, session: Session = Depends(get_sess
     session.refresh(nuevo_producto)
     return nuevo_producto
 
+
 # ==============================
 # 🔍 LISTAR PRODUCTOS CON FILTROS
 # ==============================
-
-from typing import Optional
 
 @router.get("/", response_model=List[ProductoRead])
 def listar_productos(
@@ -104,6 +105,7 @@ def obtener_producto(producto_id: int, session: Session = Depends(get_session)):
     producto.categoria
     return producto
 
+
 # ======================
 # ⚙️ ACTUALIZAR PRODUCTO
 # ======================
@@ -143,6 +145,7 @@ def actualizar_producto(producto_id: int, datos: ProductoCreate, session: Sessio
     session.refresh(producto)
     return producto
 
+
 # ==========================
 # 🧹 DESACTIVAR UN PRODUCTO
 # ==========================
@@ -166,11 +169,10 @@ def desactivar_producto(producto_id: int, session: Session = Depends(get_session
     session.refresh(producto)
     return producto
 
+
 # =======================================
 # 📦 RESTAR STOCK (GESTIONAR COMPRA)
 # =======================================
-
-from pydantic import BaseModel
 
 class CompraRequest(BaseModel):
     cantidad: int
