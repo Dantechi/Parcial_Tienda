@@ -49,41 +49,43 @@ def crear_producto(producto: ProductoCreate, session: Session = Depends(get_sess
     session.refresh(nuevo_producto)
     return nuevo_producto
 
-# ======================
+# ==============================
 # 🔍 LISTAR PRODUCTOS CON FILTROS
-# ======================
+# ==============================
 
 from typing import Optional
 
-@router.get("/", response_model=list[ProductoRead])
+@router.get("/", response_model=List[ProductoRead])
 def listar_productos(
-    session: Session = Depends(get_session),
-    categoria_id: Optional[int] = None,
     stock_min: Optional[int] = None,
+    stock_max: Optional[int] = None,
+    precio_min: Optional[float] = None,
     precio_max: Optional[float] = None,
-    activos: Optional[bool] = True
+    categoria_id: Optional[int] = None,
+    session: Session = Depends(get_session)
 ):
     """
-    Lista productos con filtros opcionales:
-    - categoria_id → filtra por categoría
-    - stock_min → productos con stock mayor o igual
-    - precio_max → productos con precio menor o igual
-    - activos → True (por defecto) para ver solo los activos
+    Retorna una lista de productos activos con filtros opcionales:
+    - stock_min, stock_max → rango de stock
+    - precio_min, precio_max → rango de precio
+    - categoria_id → filtrar por categoría específica
     """
-    query = select(Producto)
+    query = select(Producto).where(Producto.activo == True)
 
-    # Filtros dinámicos
-    if categoria_id:
-        query = query.where(Producto.categoria_id == categoria_id)
     if stock_min is not None:
         query = query.where(Producto.stock >= stock_min)
+    if stock_max is not None:
+        query = query.where(Producto.stock <= stock_max)
+    if precio_min is not None:
+        query = query.where(Producto.precio >= precio_min)
     if precio_max is not None:
         query = query.where(Producto.precio <= precio_max)
-    if activos is not None:
-        query = query.where(Producto.activo == activos)
+    if categoria_id is not None:
+        query = query.where(Producto.categoria_id == categoria_id)
 
     productos = session.exec(query).all()
     return productos
+
 
 # ======================
 # 🔁 OBTENER PRODUCTO CON SU CATEGORÍA
