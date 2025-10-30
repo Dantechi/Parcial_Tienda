@@ -61,10 +61,10 @@ PUT {{baseUrl}}/categorias/2
 Content-Type: application/json
 
 {
+  "nombre": "Ropa",
   "descripcion": "Ropa y accesorios para hombres, mujeres y niños"
 }
 
-# 💬 Esperado → categoría “Ropa” actualizada
 
 ##########################################################
 ### 5️⃣ DESACTIVAR Y REACTIVAR CATEGORÍA
@@ -132,7 +132,6 @@ Content-Type: application/json
   "categoria_id": 3
 }
 
-# 💬 Esperado → todos los productos creados (stock no negativo)
 
 ##########################################################
 ### 7️⃣ LISTAR PRODUCTOS (todos los activos)
@@ -183,11 +182,13 @@ PUT {{baseUrl}}/productos/1
 Content-Type: application/json
 
 {
+  "nombre": "Laptop Lenovo ThinkPad",
+  "descripcion": "Laptop Lenovo ThinkPad (versión 2025 actualizada)",
   "precio": 3299.99,
-  "descripcion": "Laptop Lenovo ThinkPad (versión 2025 actualizada)"
+  "stock": 10,
+  "activo": true,
+  "categoria_id": 1
 }
-
-# 💬 Esperado → producto actualizado correctamente
 
 ##########################################################
 ### 13️⃣ DESACTIVAR Y REACTIVAR PRODUCTO
@@ -205,15 +206,22 @@ PATCH {{baseUrl}}/productos/2/reactivar
 ### 14️⃣ RESTAR STOCK (simulación de compra)
 ##########################################################
 
-PATCH {{baseUrl}}/productos/1/restar_stock?cantidad=3
-# 💬 Esperado → stock reducido de 10 → 7
+PATCH {{baseUrl}}/productos/1/comprar
+Content-Type: application/json
+
+{
+  "cantidad": 3
+}
 
 ##########################################################
 ### 15️⃣ ERROR — STOCK NEGATIVO
 ##########################################################
 
-PATCH {{baseUrl}}/productos/1/restar_stock?cantidad=100
-# 💬 Esperado → error 400 con mensaje “No se puede dejar stock negativo”
+PATCH {{baseUrl}}/productos/1/comprar
+
+{
+  "cantidad":100
+}
 
 ##########################################################
 ### 16️⃣ ERROR — CATEGORÍA DUPLICADA
@@ -227,4 +235,3 @@ Content-Type: application/json
   "descripcion": "Intento de duplicado"
 }
 
-# 💬 Esperado → error 409 “El nombre de la categoría ya existe”
